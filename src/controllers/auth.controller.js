@@ -96,3 +96,19 @@ export const login = async (req, res) => {
         })
     }
 }
+
+
+// lấy thông tin user
+export const getMe = async (req, res) => {
+    try {
+        return res.status(200).json({
+            message: "Lấy thông tin user thành công",
+            user: req.user,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Lỗi server",
+            error: error.message,
+        });
+    }
+};
