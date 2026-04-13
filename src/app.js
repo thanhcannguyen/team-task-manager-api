@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 
-// Routes xử lý đăng ký
+// Routes xử lý đăng ký, đăng nhập
 app.use("/api/auth", authRoutes)
 
 export default app;
