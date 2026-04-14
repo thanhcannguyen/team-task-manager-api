@@ -35,3 +35,26 @@ export const createTeam = async (req, res) => {
         })
     }
 }
+
+
+// xem thông tin nhóm
+export const getMyTeams = async (req, res) => {
+    try {
+        // Bước 1. lấy userId từ req.user._id
+        const userId = req.user._id;
+        // Bước 2. tìm tất cả team mà members có chứa userId
+        const listTeam = await Team.find({ members: userId })
+            .populate("owner", "name email")
+            .populate("members", "name email")
+        // Bước 3. trả danh sách team về response
+        return res.status(200).json({
+            message: "Danh sách nhóm bạn đã tham gia",
+            teams: listTeam
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: "Lỗi Server",
+            error: error.message
+        })
+    }
+}
