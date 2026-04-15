@@ -139,3 +139,65 @@ export const getProjectDetail = async (req, res) => {
         })
     }
 }
+
+
+
+// Cập nhật project
+export const updateProject = async (req, res) => {
+    try {
+        // Bước 1. lấy projectId
+        const projectId = req.params.id;
+
+        // Bước 2. Tìm project trong Database
+        const project = await Project.findById(projectId);
+
+        // Bước 3. Kiểm tra project có tồn tại không
+        if (!project) {
+            return res.status(404).json({
+                message: "Không tìm thấy project"
+            });
+        }
+
+        // Bước 4. Lấy team của project
+        const team = await Team.findById(project.team);
+
+        if (!team) {
+            return res.status(404).json({
+                message: "Không tìm thấy team của project"
+            });
+        }
+
+        // Bước 5. Kiểm tra user hiện tại có quyền sửa không
+        // Tạm thời: chỉ owner team mới được sửa project
+        if (team.owner.toString() !== req.user._id.toString()) {
+            return res.status(403).json({
+                message: "Bạn không có quyền sửa project này"
+            });
+        }
+
+        // Bước 6. Lấy dữ liệu cần cập nhật từ req.body
+        const { name, description, status, startDate, endDate } = req.body;
+
+        // Bước 7. Chỉ update những field cho phép
+        if (name !== undefined) project.name = name;
+        if (description !== undefined) project.description = description;
+        if (status !== undefined) project.status = status;
+        if (startDate !== undefined) project.startDate = startDate;
+        if (endDate !== undefined) project.endDate = endDate;
+
+        // Bước 8. Lưu lại database
+        const updatedProject = await project.save();
+
+        // Bước 9. Trả response
+        return res.status(200).json({
+            message: "Cập nhật project thành công",
+            project: updatedProject
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "Lỗi server",
+            error: error.message
+        });
+    }
+};
