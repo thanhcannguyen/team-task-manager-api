@@ -1,0 +1,57 @@
+
+
+import Project from "../models/project.model.js"
+import Team from "../models/team.model.js"
+
+
+
+// Tạo dự án
+export const createProject = async (req, res) => {
+    try {
+        // Bước 1: Lấy dữ liệu
+        const { name, description, teamId } = req.body
+        // Bước 2: Xác thực dữ liệu
+        if (!name || !teamId) {
+            return res.status(400).json({
+                message: "Tên dự án và team chưa hợp lệ",
+            })
+        }
+        // Bước 3: Tìm team, kiểm tra team có tồn tại chưa
+        const team = await Team.findById(teamId)
+        // Bước 4: Nếu team không tồn tại -> báo lỗi
+        if (!team) {
+            return res.status(404).json({
+                message: "Team chưa tồn tại",
+            })
+        }
+        // Bước 5: Kiểm tra user hiện tại có thuộc team không
+        const isMember = team.members.some(
+            (memberId) => memberId.toString() === req.user._id.toString()
+        )
+        // Bước 6: Nếu không thuộc team
+        if (!isMember) {
+            return res.status(403).json({
+                message: "Bạn không thuộc team này nên không tạo được dự án"
+            })
+        }
+        // Bước 7: Tạo project mới
+        const newProject = await Project.create({
+            name,
+            description,
+            team: teamId,
+            createdBy: req.user._id
+        })
+        // Bước 8: Lưu database
+
+        // Bước 9: Trả response thành công
+        return res.status(201).json({
+            message: "Tạo project thành công",
+            newProject
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: "Lỗi server",
+            error: error.message
+        })
+    }
+}

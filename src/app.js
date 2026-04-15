@@ -5,6 +5,7 @@ import morgan from "morgan";
 
 import authRoutes from "./routes/auth.routes.js"
 import teamRoutes from "./routes/team.routes.js"
+import projectRoutes from "./routes/project.routes.js"
 
 const app = express();
 
@@ -18,5 +19,8 @@ app.use("/api/auth", authRoutes)
 
 // Route xử lý team
 app.use("/api/teams", teamRoutes)
+
+// Route xử lý Project
+app.use("/api/projects", projectRoutes)
 
 export default app;
