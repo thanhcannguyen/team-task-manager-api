@@ -1,13 +1,13 @@
 
 
-import User from "../models/user.model.js";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import User from "../models/user.model.js";     // Dùng model User để làm việc với bảng user trong MongoDB.
+import bcrypt from "bcryptjs";                  // Dùng để mã hóa mật khẩu.
+import jwt from "jsonwebtoken";                 // Dùng để tạo token đăng nhập.
 
 // Đăng ký user
 export const register = async (req, res) => {
     try {
-        // Bước 1
+        // Bước 1 
         const { name, email, password } = req.body
         // Bước 2 Check email đã tồn tại chưa
         const existEmail = await User.findOne({ email })
@@ -27,9 +27,9 @@ export const register = async (req, res) => {
         })
         // Bước 5 Tạo token
         const token = jwt.sign(
-            { id: user._id },
-            process.env.JWT_SECRET,
-            { expiresIn: "7d" }
+            { id: user._id },       // dữ liệu muốn lưu trong token 
+            process.env.JWT_SECRET, // khóa bí mật để ký token
+            { expiresIn: "7d" }     // token hết hạn sau 7 ngày
         )
         // Bước 6 Trả về user + token
         return res.status(200).json({
@@ -62,7 +62,7 @@ export const login = async (req, res) => {
         const user = await User.findOne({ email })
 
         if (!user) {
-            return res.status(404).json({
+            return res.status(400).json({
                 message: "Email hoặc mật khẩu không hợp lệ "
             })
         }

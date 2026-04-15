@@ -1,6 +1,6 @@
 
-import Team from "../models/team.model.js"
-import User from "../models/user.model.js"
+import Team from "../models/team.model.js"      // Dùng model Team để làm việc với bảng team trong MongoDB.
+import User from "../models/user.model.js"      // Dùng model User để làm việc với bảng user trong MongoDB.
 
 
 // Tạo team
@@ -45,8 +45,8 @@ export const getMyTeams = async (req, res) => {
         const userId = req.user._id;
         // Bước 2. tìm tất cả team mà members có chứa userId
         const listTeam = await Team.find({ members: userId })
-            .populate("owner", "name email")
-            .populate("members", "name email")
+            .populate("owner", "name")
+            .populate("members", "name")
         // Bước 3. trả danh sách team về response
         return res.status(200).json({
             message: "Danh sách nhóm bạn đã tham gia",
