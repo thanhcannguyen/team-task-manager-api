@@ -100,3 +100,58 @@ export const createTask = async (req, res) => {
         });
     }
 };
+
+
+
+// xem danh sách task của một project
+export const getTaskByProject = async (req, res) => {
+    try {
+        // Bước 1: Lấy projectId
+        const { projectId } = req.params;
+
+        // Bước 2: Kiểm tra project có tồn tại không
+        const project = await Project.findById(projectId);
+
+        if (!project) {
+            return res.status(404).json({
+                message: "Không tìm thấy project",
+            });
+        }
+
+        // Bước 3: Lấy team của project
+        const team = await Team.findById(project.team);
+
+        if (!team) {
+            return res.status(404).json({
+                message: "Không tìm thấy team",
+            });
+        }
+
+        // Bước 4: Kiểm tra user hiện tại có thuộc team không
+        const isMember = team.members.some(
+            (memberId) => memberId.toString() === req.user._id.toString()
+        );
+
+        if (!isMember) {
+            return res.status(403).json({
+                message: "Bạn không có quyền xem task của project này",
+            });
+        }
+
+        // Bước 5: Lấy danh sách task của project
+        const tasks = await Task.find({ project: projectId })
+            .populate("assignee", "name")
+            .populate("createdBy", "name");
+
+        // Bước 6: Trả response
+        return res.status(200).json({
+            message: "Lấy danh sách task thành công",
+            tasks,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Lỗi server",
+            error: error.message,
+        });
+    }
+}
