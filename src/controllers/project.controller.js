@@ -97,3 +97,45 @@ export const getProjectsByTeam = async (req, res) => {
         })
     }
 }
+
+
+
+//  Xem thông tin chi tiết của 1 project
+export const getProjectDetail = async (req, res) => {
+    try {
+        // Bước 1 lấy dữ liệu
+        const projectId = req.params.id
+        // Bước 2 Tìm project trong Database
+        const project = await Project.findById(projectId)
+            .populate("createdBy", "name ")
+            .populate("team", "name description");
+        // Bước 3 Kiểm tra project có tồn tại không
+        if (!project) {
+            return res.status(404).json({
+                message: "Không tìm thấy project"
+            })
+        }
+        //
+        const team = await Team.findById(project.team._id);
+        // Bước 4 Kiểm tra xem user hiện tại có quyền xem không
+        const isMember = team.members.some(
+            (memberId) => memberId.toString() === req.user._id.toString()
+        )
+        if (!isMember) {
+            return res.status(403).json({
+                message: "User không thuộc team nên không được xem project của team"
+            })
+        }
+        // Bước 5. nếu hợp lệ -> trả kết quả
+        return res.status(200).json({
+            message: "Lấy chi tiết project thành công",
+            project
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "Lỗi server",
+            error: error.message
+        })
+    }
+}
