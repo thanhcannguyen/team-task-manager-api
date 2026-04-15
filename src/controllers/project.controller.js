@@ -201,3 +201,53 @@ export const updateProject = async (req, res) => {
         });
     }
 };
+
+
+// Xóa project
+export const deleteProject = async (req, res) => {
+    try {
+        // Bước 1. Lấy projectId
+        const projectId = req.params.id;
+
+        // Bước 2. Tìm project trong database
+        const project = await Project.findById(projectId);
+
+        // Bước 3. Kiểm tra project có tồn tại không
+        if (!project) {
+            return res.status(404).json({
+                message: "Không tìm thấy project"
+            });
+        }
+
+        // Bước 4. Lấy team của project
+        const team = await Team.findById(project.team);
+
+        if (!team) {
+            return res.status(404).json({
+                message: "Không tìm thấy team của project"
+            });
+        }
+
+        // Bước 5. Kiểm tra quyền xóa
+        // Tạm thời: chỉ owner của team mới được xóa
+        if (team.owner.toString() !== req.user._id.toString()) {
+            return res.status(403).json({
+                message: "Bạn không có quyền xóa project này"
+            });
+        }
+
+        // Bước 6. Xóa project
+        await project.deleteOne();
+
+        // Bước 7. Trả response
+        return res.status(200).json({
+            message: "Xóa project thành công"
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "Lỗi server",
+            error: error.message
+        });
+    }
+};

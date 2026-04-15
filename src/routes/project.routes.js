@@ -5,7 +5,8 @@ import {
     createProject,
     getProjectsByTeam,
     getProjectDetail,
-    updateProject
+    updateProject,
+    deleteProject
 } from "../controllers/project.controller.js"
 import { protect } from "../middlewares/auth.middleware.js";
 
@@ -22,6 +23,9 @@ router.get("/:id", protect, getProjectDetail)
 
 // PATCH /:id -> cập nhật project
 router.patch("/:id", protect, updateProject)
+
+// DELETE /:id -> xóa project
+router.delete("/:id", protect, deleteProject)
 
 
 export default router
