@@ -55,3 +55,45 @@ export const createProject = async (req, res) => {
         })
     }
 }
+
+
+// lấy danh sách project thuộc team
+export const getProjectsByTeam = async (req, res) => {
+    try {
+        // Bước 1. Lấy dữ liệu
+        const { teamId } = req.params
+
+        // Bước 2. Kiểm tra team có tồn tại chưa
+        const team = await Team.findById(teamId)
+
+        // Bước 3. Xác thực 
+        if (!team) {
+            return res.status(404).json({
+                message: "Team chưa tồn tại"
+            })
+        }
+
+        // Bước 4. Kiểm tra user có thuộc team 
+        const isMember = team.members.some(
+            (memberId) => memberId.toString() === req.user._id.toString()
+        )
+        // Bước 5. 
+        if (!isMember) {
+            return res.status(403).json({
+                message: "User không thuộc team nên không được xem project của team"
+            })
+        }
+        // Bước 6. nếu hợp lệ -> trả kết quả
+        const listProject = await Project.find({ team: teamId }).populate("createdBy", "name")
+        return res.status(200).json({
+            message: "Danh sách các project mà bạn tham gia",
+            project: listProject
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "Lỗi server",
+            error: error.message
+        })
+    }
+}
