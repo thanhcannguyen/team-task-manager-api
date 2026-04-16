@@ -1,45 +1,45 @@
 # Team Task Manager API
 
-A RESTful API for managing teams, projects, and tasks — built to support collaborative workflows where multiple users share a workspace, organize work into projects, and track progress through tasks.
+API RESTful phục vụ quản lý nhóm, dự án và công việc — cho phép nhiều người dùng cùng làm việc trong một không gian chung, tổ chức công việc theo dự án và theo dõi tiến độ qua từng task.
 
 ---
 
-## Tech Stack
+## Công nghệ sử dụng
 
-| Layer | Technology |
+| Tầng | Công nghệ |
 |---|---|
 | Runtime | Node.js (ES Modules) |
 | Framework | Express.js v5 |
-| Database | MongoDB + Mongoose |
-| Authentication | JWT (JSON Web Token) |
-| Password Security | bcryptjs |
-| Dev Tooling | Nodemon, Morgan |
+| Cơ sở dữ liệu | MongoDB + Mongoose |
+| Xác thực | JWT (JSON Web Token) |
+| Bảo mật mật khẩu | bcryptjs |
+| Công cụ dev | Nodemon, Morgan |
 
 ---
 
-## Features
+## Tính năng
 
-- **Authentication** — Register, login, and retrieve authenticated user profile via JWT Bearer token
-- **Team Management** — Create teams, view your teams, and add members
-- **Project Management** — Full CRUD for projects scoped to a team, with status tracking (`planning` → `in-progress` → `completed`)
-- **Task Management** — Create tasks under a project, view task lists, inspect task detail, and assign tasks to team members
-- **Authorization Middleware** — Every protected route validates the Bearer token and attaches the authenticated user to the request context
+- **Xác thực người dùng** — Đăng ký, đăng nhập và lấy thông tin cá nhân thông qua JWT Bearer token
+- **Quản lý nhóm** — Tạo nhóm, xem danh sách nhóm của bản thân, thêm thành viên vào nhóm
+- **Quản lý dự án** — CRUD đầy đủ cho dự án theo nhóm, theo dõi trạng thái (`planning` → `in-progress` → `completed`)
+- **Quản lý task** — Tạo task thuộc dự án, xem danh sách và chi tiết task, giao task cho thành viên trong nhóm
+- **Middleware bảo vệ route** — Mọi route cần xác thực đều kiểm tra Bearer token và gắn thông tin user vào request
 
 ---
 
-## Project Structure
+## Cấu trúc thư mục
 
 ```
 src/
 ├── config/
-│   └── db.js                  # MongoDB connection
+│   └── db.js                  # Kết nối MongoDB
 ├── controllers/
-│   ├── auth.controller.js     # Register, login, get profile
-│   ├── team.controller.js     # Team CRUD + member management
-│   ├── project.controller.js  # Project CRUD
-│   └── task.controller.js     # Task CRUD + assignment
+│   ├── auth.controller.js     # Đăng ký, đăng nhập, lấy profile
+│   ├── team.controller.js     # Quản lý nhóm và thành viên
+│   ├── project.controller.js  # Quản lý dự án
+│   └── task.controller.js     # Quản lý task và phân công
 ├── middlewares/
-│   └── auth.middleware.js     # JWT verification guard
+│   └── auth.middleware.js     # Middleware xác thực JWT
 ├── models/
 │   ├── user.model.js
 │   ├── team.model.js
@@ -50,36 +50,36 @@ src/
 │   ├── team.routes.js
 │   ├── project.routes.js
 │   └── task.routes.js
-├── app.js                     # Express app setup
-└── server.js                  # Entry point
+├── app.js                     # Khởi tạo Express app
+└── server.js                  # Điểm khởi động server
 ```
 
 ---
 
-## Getting Started
+## Hướng dẫn cài đặt
 
-### Prerequisites
+### Yêu cầu
 
 - Node.js ≥ 18
-- MongoDB (local or Atlas)
+- MongoDB (local hoặc Atlas)
 
-### Installation
+### Các bước cài đặt
 
 ```bash
-# 1. Clone the repository
+# 1. Clone repository
 git clone https://github.com/thanhcannguyen/team-task-manager-api.git
 cd team-task-manager-api
 
-# 2. Install dependencies
+# 2. Cài đặt dependencies
 npm install
 
-# 3. Configure environment variables
+# 3. Cấu hình biến môi trường
 cp .env.example .env
 ```
 
-### Environment Variables
+### Biến môi trường
 
-Create a `.env` file in the root directory:
+Tạo file `.env` ở thư mục gốc:
 
 ```env
 PORT=5000
@@ -87,66 +87,66 @@ MONGO_URI=mongodb://localhost:27017/team-task-manager
 JWT_SECRET=your_jwt_secret_key
 ```
 
-### Running the Server
+### Khởi chạy
 
 ```bash
-# Development (with hot reload)
+# Môi trường development (tự reload khi code thay đổi)
 npm run dev
 
-# Production
+# Môi trường production
 npm start
 ```
 
-Server runs at `http://localhost:5000`
+Server chạy tại `http://localhost:5000`
 
 ---
 
-## API Endpoints
+## Danh sách API
 
-### Auth — `/api/auth`
+### Xác thực — `/api/auth`
 
-| Method | Endpoint | Auth | Description |
+| Method | Endpoint | Yêu cầu Auth | Mô tả |
 |--------|----------|------|-------------|
-| POST | `/register` | No | Create a new user account |
-| POST | `/login` | No | Login and receive a JWT token |
-| GET | `/me` | ✅ | Get authenticated user's profile |
+| POST | `/register` | Không | Đăng ký tài khoản mới |
+| POST | `/login` | Không | Đăng nhập, nhận JWT token |
+| GET | `/me` | ✅ | Lấy thông tin người dùng hiện tại |
 
-### Teams — `/api/teams`
+### Nhóm — `/api/teams`
 
-| Method | Endpoint | Auth | Description |
+| Method | Endpoint | Yêu cầu Auth | Mô tả |
 |--------|----------|------|-------------|
-| POST | `/` | ✅ | Create a new team |
-| GET | `/my-teams` | ✅ | Get all teams the user belongs to |
-| POST | `/:teamId/members` | ✅ | Add a member to a team |
+| POST | `/` | ✅ | Tạo nhóm mới |
+| GET | `/my-teams` | ✅ | Lấy danh sách nhóm của bản thân |
+| POST | `/:teamId/members` | ✅ | Thêm thành viên vào nhóm |
 
-### Projects — `/api/projects`
+### Dự án — `/api/projects`
 
-| Method | Endpoint | Auth | Description |
+| Method | Endpoint | Yêu cầu Auth | Mô tả |
 |--------|----------|------|-------------|
-| POST | `/` | ✅ | Create a new project under a team |
-| GET | `/team/:teamId` | ✅ | Get all projects of a team |
-| GET | `/:id` | ✅ | Get project detail |
-| PATCH | `/:id` | ✅ | Update project info or status |
-| DELETE | `/:id` | ✅ | Delete a project |
+| POST | `/` | ✅ | Tạo dự án mới thuộc một nhóm |
+| GET | `/team/:teamId` | ✅ | Lấy danh sách dự án của nhóm |
+| GET | `/:id` | ✅ | Xem chi tiết dự án |
+| PATCH | `/:id` | ✅ | Cập nhật thông tin hoặc trạng thái dự án |
+| DELETE | `/:id` | ✅ | Xóa dự án |
 
-### Tasks — `/api/tasks`
+### Task — `/api/tasks`
 
-| Method | Endpoint | Auth | Description |
+| Method | Endpoint | Yêu cầu Auth | Mô tả |
 |--------|----------|------|-------------|
-| POST | `/` | ✅ | Create a task under a project |
-| GET | `/project/:projectId` | ✅ | Get all tasks of a project |
-| GET | `/:id` | ✅ | Get task detail |
-| PATCH | `/:id/assign` | ✅ | Assign a task to a team member |
+| POST | `/` | ✅ | Tạo task thuộc dự án |
+| GET | `/project/:projectId` | ✅ | Lấy danh sách task của dự án |
+| GET | `/:id` | ✅ | Xem chi tiết task |
+| PATCH | `/:id/assign` | ✅ | Giao task cho thành viên trong nhóm |
 
-> All protected routes require the `Authorization: Bearer <token>` header.
+> Tất cả route có bảo vệ đều yêu cầu header: `Authorization: Bearer <token>`
 
 ---
 
-## Data Models
+## Mô hình dữ liệu
 
 ### User
 ```
-name, email (unique), password (hashed), timestamps
+name, email (duy nhất), password (đã mã hóa), timestamps
 ```
 
 ### Team
@@ -169,17 +169,17 @@ status (todo | in-progress | done), dueDate, timestamps
 
 ---
 
-## Authentication Flow
+## Luồng xác thực
 
-1. Register or login to receive a JWT token (valid for **7 days**)
-2. Include the token in subsequent requests:
+1. Đăng ký hoặc đăng nhập để nhận JWT token (có hiệu lực **7 ngày**)
+2. Đính kèm token vào mọi request cần xác thực:
    ```
    Authorization: Bearer <your_token>
    ```
-3. The `protect` middleware validates the token and injects the user object into `req.user` for controller use
+3. Middleware `protect` tự động xác thực token và gắn thông tin user vào `req.user` để controller xử lý tiếp
 
 ---
 
-## License
+## Giấy phép
 
 ISC
