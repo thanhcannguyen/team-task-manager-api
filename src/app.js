@@ -27,4 +27,11 @@ app.use("/api/projects", projectRoutes)
 // Route xử lý Task
 app.use("/api/tasks", taskRoutes)
 
+app.get("/", (req, res) => {
+    res.json({
+        message: "API is running 🚀",
+        version: "1.0.0"
+    });
+});
+
 export default app;
