@@ -155,3 +155,66 @@ export const getTaskByProject = async (req, res) => {
         });
     }
 }
+
+
+// Xem chi tiết một task
+export const getTaskDetail = async (req, res) => {
+    try {
+        // Bước 1: Lấy taskId từ params
+        const { id } = req.params;
+
+        // Bước 2: Tìm task trong database
+        const task = await Task.findById(id)
+            .populate("assignee", "name email")
+            .populate("createdBy", "name email")
+            .populate("project", "name description")
+            .populate("team", "name description");
+
+        // Bước 3: Kiểm tra task có tồn tại không
+        if (!task) {
+            return res.status(404).json({
+                message: "Không tìm thấy task",
+            });
+        }
+
+        // Bước 4: Kiểm tra project của task có tồn tại không
+        const project = await Project.findById(task.project._id);
+
+        if (!project) {
+            return res.status(404).json({
+                message: "Không tìm thấy project của task",
+            });
+        }
+
+        // Bước 5: Kiểm tra team của task có tồn tại không
+        const team = await Team.findById(task.team._id);
+
+        if (!team) {
+            return res.status(404).json({
+                message: "Không tìm thấy team của task",
+            });
+        }
+
+        // Bước 6: Kiểm tra user hiện tại có thuộc team không
+        const isMember = team.members.some(
+            (memberId) => memberId.toString() === req.user._id.toString()
+        );
+
+        if (!isMember) {
+            return res.status(403).json({
+                message: "Bạn không có quyền xem task này",
+            });
+        }
+
+        // Bước 7: Trả kết quả
+        return res.status(200).json({
+            message: "Lấy chi tiết task thành công",
+            task,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Lỗi server",
+            error: error.message,
+        });
+    }
+};
