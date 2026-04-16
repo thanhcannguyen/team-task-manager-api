@@ -218,3 +218,91 @@ export const getTaskDetail = async (req, res) => {
         });
     }
 };
+
+
+// Giao task cho user
+export const assignTask = async (req, res) => {
+    try {
+        // Bước 1: Lấy taskId và assignee từ request
+        const taskId = req.params.id;
+        const { assignee } = req.body;
+
+        // Bước 2: Validate dữ liệu
+        if (!assignee) {
+            return res.status(400).json({
+                message: "Thiếu user cần được giao task"
+            });
+        }
+
+        // Bước 3: Tìm task
+        const task = await Task.findById(taskId);
+
+        if (!task) {
+            return res.status(404).json({
+                message: "Không tìm thấy task"
+            });
+        }
+
+        // Bước 4: Tìm team của task
+        const team = await Team.findById(task.team);
+
+        if (!team) {
+            return res.status(404).json({
+                message: "Không tìm thấy team của task"
+            });
+        }
+
+        // Bước 5: Kiểm tra user hiện tại có thuộc team không
+        const isMember = team.members.some(
+            (memberId) => memberId.toString() === req.user._id.toString()
+        );
+
+        if (!isMember) {
+            return res.status(403).json({
+                message: "Bạn không thuộc team nên không có quyền giao task"
+            });
+        }
+
+        // Bước 6: Kiểm tra user được giao có tồn tại không
+        const user = await User.findById(assignee);
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User được giao task không tồn tại"
+            });
+        }
+
+        // Bước 7: Kiểm tra user được giao có thuộc team không
+        const isAssigneeInTeam = team.members.some(
+            (memberId) => memberId.toString() === assignee.toString()
+        );
+
+        if (!isAssigneeInTeam) {
+            return res.status(400).json({
+                message: "User được giao task không thuộc team"
+            });
+        }
+
+        // Bước 8: Cập nhật assignee cho task
+        task.assignee = assignee;
+        await task.save();
+
+        // Bước 9: Lấy lại task đã populate
+        const updatedTask = await Task.findById(task._id)
+            .populate("assignee", "name email")
+            .populate("createdBy", "name email")
+            .populate("project", "name");
+
+        // Bước 10: Trả response
+        return res.status(200).json({
+            message: "Giao task thành công",
+            task: updatedTask
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "Lỗi server",
+            error: error.message
+        });
+    }
+};

@@ -4,7 +4,8 @@ import express from "express"
 import {
     createTask,
     getTaskByProject,
-    getTaskDetail
+    getTaskDetail,
+    assignTask
 } from "../controllers/task.controller.js"
 import { protect } from "../middlewares/auth.middleware.js";
 
@@ -18,5 +19,8 @@ router.get("/project/:projectId", protect, getTaskByProject);
 
 // GET /:id -> xem danh sách chi tiết của task
 router.get("/:id", protect, getTaskDetail);
+
+// PATCH /:id/assign -> giao task cho user
+router.patch("/:id/assign", protect, assignTask);
 
 export default router
